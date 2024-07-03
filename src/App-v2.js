@@ -1,53 +1,6 @@
 import { useEffect, useState } from "react";
 import StarRating from "./StarRating";
 
-const tempMovieData = [
-  {
-    imdbID: "tt1375666",
-    Title: "Inception",
-    Year: "2010",
-    Poster:
-      "https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_SX300.jpg",
-  },
-  {
-    imdbID: "tt0133093",
-    Title: "The Matrix",
-    Year: "1999",
-    Poster:
-      "https://m.media-amazon.com/images/M/MV5BNzQzOTk3OTAtNDQ0Zi00ZTVkLWI0MTEtMDllZjNkYzNjNTc4L2ltYWdlXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_SX300.jpg",
-  },
-  {
-    imdbID: "tt6751668",
-    Title: "Parasite",
-    Year: "2019",
-    Poster:
-      "https://m.media-amazon.com/images/M/MV5BYWZjMjk3ZTItODQ2ZC00NTY5LWE0ZDYtZTI3MjcwN2Q5NTVkXkEyXkFqcGdeQXVyODk4OTc3MTY@._V1_SX300.jpg",
-  },
-];
-
-const tempWatchedData = [
-  {
-    imdbID: "tt1375666",
-    Title: "Inception",
-    Year: "2010",
-    Poster:
-      "https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_SX300.jpg",
-    runtime: 148,
-    imdbRating: 8.8,
-    userRating: 10,
-  },
-  {
-    imdbID: "tt0088763",
-    Title: "Back to the Future",
-    Year: "1985",
-    Poster:
-      "https://m.media-amazon.com/images/M/MV5BZmU0M2Y1OGUtZjIxNi00ZjBkLTg1MjgtOWIyNThiZWIwYjRiXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg",
-    runtime: 116,
-    imdbRating: 8.5,
-    userRating: 9,
-  },
-];
-
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
@@ -61,33 +14,6 @@ export default function App() {
   const [error, setError] = useState("");
   const [selectedId, setSelectedId] = useState(null);
 
-  // const tempQuery = "interstellar";
-
-  /*
-  useEffect(function () {
-    console.log("After initial render");
-  }, []);
-
-  useEffect(function () {
-    console.log("After every render");
-  });
-
-  useEffect(
-    function () {
-      console.log("D");
-    },
-    [query]
-  );
-
-  console.log("during render");
-  */
-
-  // registering the side effect to be executed in the certain point
-  // of the time
-  // second argument is the dependency array
-  // [] this side effect means that the code is only render on mount (
-  // means initial rendering)
-
   function handleSelectMovie(id) {
     setSelectedId((selectedId) => (id === selectedId ? null : id));
   }
@@ -97,13 +23,28 @@ export default function App() {
     setSelectedId(null);
   }
 
+  // localStorage.setItem("test", "testValue");
+
   function handleAddWatched(movie) {
     setWatched((watched) => [...watched, movie]);
+    //  function available in all browsers and is key value pair info for each domain is available
+    //  in local storage we can use only key value pairs which the value is string(importantt!!!!!!!!!!!)
+    // localStorage.setItem("watched", JSON.stringify([...watched, movie]));
   }
 
   function handleDeleteWatched(id) {
     setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
   }
+
+  console.log("Hellooooooo");
+
+  useEffect(
+    function () {
+      console.log("Updating watched in localStorage:", watched);
+      localStorage.setItem("watched", JSON.stringify(watched));
+    },
+    [watched]
+  );
 
   useEffect(
     function () {
@@ -323,6 +264,7 @@ function MovieDetailes({ selectedId, onCloseMovie, onAddWatched, watched }) {
   const watchedUserrating = watched.find(
     (movie) => movie.imdbID === selectedId
   )?.userRating;
+
   const {
     Title: title,
     Year: year,
@@ -336,6 +278,33 @@ function MovieDetailes({ selectedId, onCloseMovie, onAddWatched, watched }) {
     Genre: genre,
   } = movie;
 
+  // how to disable eslint rules
+  /* eslint-disable */
+  // if (imdbRating > 8) {
+  //   [isTop, setIsTop] = useState(true);
+  // }
+
+  //  instead of the 6 hooks we have only 3 by the below way or an early return
+  // if (imdbRating > 8) return <p>Greatest ever!</p>;
+
+  //  first or initial render the imdbrating is false , so whatever we pass to usestat
+  //  it only matters for the initial render , here below , no where we update the state
+  //  first time the component is rendered the movie state is empty object because its usestate first value is em... , until the answer of useeffect fetching data would arrive
+
+  // const [isTop, setIsTop] = useState(imdbRating > 8);
+  // useEffect(
+  //   function () {
+  //     setIsTop(imdbRating > 8);
+  //   },
+  //   [imdbRating]
+  // );
+
+  //  this is the derived state after each render it updates , so at first is false and then becomes true
+  const isTop = imdbRating > 8;
+  console.log(isTop);
+
+  // we want to show the avg of rating we give to the movie that we added to our watch list and its own imdbrating
+  // const [avgRating, setAvgRating] = useState(0);
   function handleAdd() {
     const newWatchedMovie = {
       imdbID: selectedId,
@@ -349,6 +318,9 @@ function MovieDetailes({ selectedId, onCloseMovie, onAddWatched, watched }) {
 
     onAddWatched(newWatchedMovie);
     onCloseMovie();
+
+    // setAvgRating(Number(imdbRating));
+    // setAvgRating((avgRating) => (avgRating + userRating) / 2);
   }
 
   //  useEffect is called escapehatch
@@ -422,6 +394,8 @@ function MovieDetailes({ selectedId, onCloseMovie, onAddWatched, watched }) {
               </p>
             </div>
           </header>
+
+          {/* <p>{avgRating}</p> */}
           <section>
             <div className="rating">
               {!isWatched ? (
